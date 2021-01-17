@@ -6,12 +6,13 @@ import java.util.*
 
 data class AuctionEntity(
     var id: UUID,
+    val title: String,
     var auctionPath: String,
     var sellerId: UUID,
     var quantity: Int,
     var boughtQuantity: Int,
     var prive: BigDecimal,
-    var reviews: List<AuctionReviewsEntity>,
+    var reviews: MutableList<AuctionReviewsEntity>,
     var thumbnail: Binary,
     var description: String
 )

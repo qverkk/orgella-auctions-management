@@ -1,4 +1,9 @@
 package com.orgella.auctionsmanagement.infrastructure.repository.mongo
 
-interface SpringDataMongoAuctionsRepository {
+import com.orgella.auctionsmanagement.domain.AuctionEntity
+import org.springframework.data.mongodb.repository.MongoRepository
+import java.util.*
+
+interface SpringDataMongoAuctionsRepository : MongoRepository<AuctionEntity, UUID> {
+
 }
