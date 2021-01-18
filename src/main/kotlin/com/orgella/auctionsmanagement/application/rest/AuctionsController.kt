@@ -5,10 +5,9 @@ import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
 import org.bson.types.Binary
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
 import java.security.Principal
 import java.time.Instant
@@ -43,5 +42,11 @@ class AuctionsController(
         )
 
         auctionService.createAuction(auction)
+    }
+
+    @PreAuthorize("#username == authentication.principal.username")
+    @GetMapping(value = ["/{username}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getUserDetailsByUsername(@PathVariable username: String): ResponseEntity<String>? {
+        return ResponseEntity.ok("Has access")
     }
 }
