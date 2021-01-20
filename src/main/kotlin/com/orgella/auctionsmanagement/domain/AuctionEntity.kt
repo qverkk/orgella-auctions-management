@@ -8,10 +8,11 @@ data class AuctionEntity(
     var id: UUID,
     val title: String,
     var auctionPath: String,
-    var sellerId: UUID,
+    var sellerUsername: String,
     var quantity: Int,
     var boughtQuantity: Int,
-    var prive: BigDecimal,
+    var price: BigDecimal,
+    var category: String,
     var reviews: MutableList<AuctionReviewsEntity>,
     var thumbnail: Binary,
     var description: String

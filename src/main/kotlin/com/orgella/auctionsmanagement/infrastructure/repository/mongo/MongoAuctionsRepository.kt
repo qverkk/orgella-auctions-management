@@ -22,4 +22,16 @@ class MongoAuctionsRepository(
     override fun deleteAuctionById(id: UUID) {
         auctionRepository.deleteById(id)
     }
+
+    override fun findAll(): List<AuctionEntity> {
+        return auctionRepository.findAll()
+    }
+
+    override fun findAllContainingQuery(query: String): List<AuctionEntity> {
+        return auctionRepository.findAllByTitleIsContaining(query)
+    }
+
+    override fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity> {
+        return auctionRepository.findAllByTitleIsContainingAndCategory(query, category)
+    }
 }

@@ -33,9 +33,27 @@ class DomainAuctionService(
 
     override fun updatePriceForAuction(id: UUID, price: BigDecimal) {
         auctionsRepository.findById(id).ifPresent {
-            it.prive = price
+            it.price = price
             auctionsRepository.save(it)
         }
+    }
+
+    override fun findAllAuctions(): List<AuctionEntity> {
+        return auctionsRepository.findAll()
+    }
+
+    override fun findReviewsForAuctionById(id: UUID): List<AuctionReviewsEntity> {
+        val auction = auctionsRepository.findById(id).orElseGet { null } ?: return emptyList()
+
+        return auction.reviews
+    }
+
+    override fun findAllContainingQuery(query: String): List<AuctionEntity> {
+        return auctionsRepository.findAllContainingQuery(query)
+    }
+
+    override fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity> {
+        return auctionsRepository.findAllContainingQueryAndCategory(query, category)
     }
 
     override fun findById(id: UUID): Optional<AuctionEntity> {

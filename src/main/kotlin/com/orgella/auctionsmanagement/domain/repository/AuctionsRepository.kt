@@ -8,6 +8,12 @@ interface AuctionsRepository {
     fun findById(id: UUID): Optional<AuctionEntity>
 
     fun save(auction: AuctionEntity)
-    
+
     fun deleteAuctionById(id: UUID)
+
+    fun findAll(): List<AuctionEntity>
+
+    fun findAllContainingQuery(query: String): List<AuctionEntity>
+
+    fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity>
 }

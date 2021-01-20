@@ -6,4 +6,7 @@ import java.util.*
 
 interface SpringDataMongoAuctionsRepository : MongoRepository<AuctionEntity, UUID> {
 
+    fun findAllByTitleIsContaining(title: String): List<AuctionEntity>
+
+    fun findAllByTitleIsContainingAndCategory(title: String, category: String): List<AuctionEntity>
 }

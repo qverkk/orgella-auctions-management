@@ -18,4 +18,12 @@ interface AuctionService {
     fun updateDescriptionForAuction(id: UUID, description: String)
 
     fun updatePriceForAuction(id: UUID, price: BigDecimal)
+
+    fun findAllAuctions(): List<AuctionEntity>
+
+    fun findReviewsForAuctionById(id: UUID): List<AuctionReviewsEntity>
+
+    fun findAllContainingQuery(query: String): List<AuctionEntity>
+
+    fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity>
 }

@@ -13,9 +13,11 @@ data class CreateNewAuctionRequest(
     @field:NotNull(message = "Quantity cannot be null")
     @field:Min(1, message = "Minimum quantity is 1")
     var quantity: Int,
-    @field:NotNull(message = "Quantity cannot be null")
+    @field:NotNull(message = "Price cannot be null")
     @field:Pattern(regexp = "^(0|[1-9]\\d+)\\.(\\d){2}$", message = "Price must be in format: 11.1 or 0.1")
-    var prive: String,
+    var price: String,
+    @field:NotNull(message = "Category cannot be null")
+    var category: String,
     @field:NotNull(message = "Description cannot be null")
     @field:Size(min = 30, message = "Minimum description length is 30 characters")
     var description: String,
