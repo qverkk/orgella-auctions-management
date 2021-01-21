@@ -2,9 +2,11 @@ package com.orgella.auctionsmanagement.application.rest
 
 import com.orgella.auctionsmanagement.application.mapper.AuctionsMapper
 import com.orgella.auctionsmanagement.application.request.CreateNewAuctionRequest
+import com.orgella.auctionsmanagement.application.response.GetAuctionDetailsResponse
 import com.orgella.auctionsmanagement.application.response.GetAuctionResponse
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
+import com.orgella.auctionsmanagement.exceptions.NoAuctionPath
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
 import org.bson.types.Binary
 import org.springframework.http.MediaType
@@ -24,7 +26,7 @@ class AuctionsController(
     private val auctionService: AuctionService
 ) {
 
-    @PreAuthorize("hasRole('ROLE_SELLER')")
+    //    @PreAuthorize("hasRole('ROLE_SELLER')")
     @PostMapping
     fun createAuction(
         @ModelAttribute @Valid createNewAuctionRequest: CreateNewAuctionRequest,
@@ -54,18 +56,30 @@ class AuctionsController(
     fun findAuctionsByName(
         @RequestParam query: String,
         @RequestParam(required = false) category: String?
-    ): List<GetAuctionResponse> {
-        var auctions: List<AuctionEntity> = emptyList()
-        if (category == null) {
-            auctions = auctionService.findAllContainingQuery(query)
+    ): ResponseEntity<List<GetAuctionResponse>> {
+        val auctions: List<AuctionEntity> = if (category == null) {
+            auctionService.findAllContainingQuery(query)
         } else {
-            auctions = auctionService.findAllContainingQueryAndCategory(query, category)
+            auctionService.findAllContainingQueryAndCategory(query, category)
         }
 
-        return auctions.stream()
-            .map {
-                AuctionsMapper.toResponse(it)
-            }.collect(Collectors.toList())
+        return ResponseEntity.ok(
+            auctions.stream()
+                .map {
+                    AuctionsMapper.toGetAuctionResponse(it)
+                }.collect(Collectors.toList())
+        )
+    }
+
+    @GetMapping("/details/{auctionPath}")
+    fun getAuctionDetails(@PathVariable auctionPath: String): ResponseEntity<GetAuctionDetailsResponse> {
+        val auction = auctionService.findByAuctionPath(auctionPath).orElseThrow {
+            throw NoAuctionPath("$auctionPath doesn't exist")
+        }
+
+        return ResponseEntity.ok(
+            AuctionsMapper.toGetAuctionDetailsResponse(auction)
+        )
     }
 
     @PreAuthorize("#username == authentication.principal.username")

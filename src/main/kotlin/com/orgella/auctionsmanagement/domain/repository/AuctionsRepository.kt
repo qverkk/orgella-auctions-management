@@ -16,4 +16,6 @@ interface AuctionsRepository {
     fun findAllContainingQuery(query: String): List<AuctionEntity>
 
     fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity>
+
+    fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity>
 }

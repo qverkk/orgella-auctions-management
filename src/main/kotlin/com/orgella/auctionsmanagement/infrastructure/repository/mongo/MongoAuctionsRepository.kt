@@ -34,4 +34,8 @@ class MongoAuctionsRepository(
     override fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity> {
         return auctionRepository.findAllByTitleIsContainingAndCategory(query, category)
     }
+
+    override fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity> {
+        return auctionRepository.findByAuctionPath(auctionPath)
+    }
 }
