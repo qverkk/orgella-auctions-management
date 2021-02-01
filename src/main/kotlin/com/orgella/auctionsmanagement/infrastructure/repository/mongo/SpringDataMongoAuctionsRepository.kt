@@ -11,4 +11,6 @@ interface SpringDataMongoAuctionsRepository : MongoRepository<AuctionEntity, UUI
     fun findAllByTitleIsContainingAndCategory(title: String, category: String): List<AuctionEntity>
 
     fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity>
+
+    fun findAllByAuctionPathIn(auctionPaths: List<String>): List<AuctionEntity>
 }

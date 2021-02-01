@@ -2,12 +2,15 @@ package com.orgella.auctionsmanagement.application.rest
 
 import com.orgella.auctionsmanagement.application.mapper.AuctionsMapper
 import com.orgella.auctionsmanagement.application.request.CreateNewAuctionRequest
+import com.orgella.auctionsmanagement.application.response.BasketItemInfo
 import com.orgella.auctionsmanagement.application.response.GetAuctionDetailsResponse
 import com.orgella.auctionsmanagement.application.response.GetAuctionResponse
+import com.orgella.auctionsmanagement.application.response.GetAuctionsForBasketResponse
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
 import com.orgella.auctionsmanagement.exceptions.NoAuctionPath
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
+import org.bson.internal.Base64
 import org.bson.types.Binary
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -57,7 +60,7 @@ class AuctionsController(
         @RequestParam query: String,
         @RequestParam(required = false) category: String?
     ): ResponseEntity<List<GetAuctionResponse>> {
-        val auctions: List<AuctionEntity> = if (category == null) {
+        val auctions: List<AuctionEntity> = if (category == null || category == "Wszystkie") {
             auctionService.findAllContainingQuery(query)
         } else {
             auctionService.findAllContainingQueryAndCategory(query, category)
@@ -79,6 +82,26 @@ class AuctionsController(
 
         return ResponseEntity.ok(
             AuctionsMapper.toGetAuctionDetailsResponse(auction)
+        )
+    }
+
+    @GetMapping("/details/basket")
+    fun getAutctionsForBasket(@RequestParam auctionPaths: List<String>): ResponseEntity<GetAuctionsForBasketResponse> {
+        val auctions = auctionService.findByAuctionPaths(auctionPaths)
+
+        return ResponseEntity.ok(
+            GetAuctionsForBasketResponse(
+                auctions.stream().map {
+                    BasketItemInfo(
+                        it.id,
+                        it.title,
+                        it.auctionPath,
+                        it.quantity,
+                        it.price,
+                        Base64.encode(it.thumbnail.data)
+                    )
+                }.collect(Collectors.toList())
+            )
         )
     }
 

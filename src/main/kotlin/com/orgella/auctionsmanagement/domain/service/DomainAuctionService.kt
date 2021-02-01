@@ -60,6 +60,10 @@ class DomainAuctionService(
         return auctionsRepository.findByAuctionPath(auctionPath)
     }
 
+    override fun findByAuctionPaths(auctionPaths: List<String>): List<AuctionEntity> {
+        return auctionsRepository.findAllWithAuctionPaths(auctionPaths)
+    }
+
     override fun findById(id: UUID): Optional<AuctionEntity> {
         return auctionsRepository.findById(id)
     }

@@ -38,4 +38,8 @@ class MongoAuctionsRepository(
     override fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity> {
         return auctionRepository.findByAuctionPath(auctionPath)
     }
+
+    override fun findAllWithAuctionPaths(auctionPaths: List<String>): List<AuctionEntity> {
+        return auctionRepository.findAllByAuctionPathIn(auctionPaths)
+    }
 }

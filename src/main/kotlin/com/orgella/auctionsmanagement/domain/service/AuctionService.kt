@@ -28,4 +28,6 @@ interface AuctionService {
     fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity>
 
     fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity>
+
+    fun findByAuctionPaths(auctionPaths: List<String>): List<AuctionEntity>
 }
