@@ -12,6 +12,7 @@ import com.orgella.auctionsmanagement.exceptions.NoAuctionPath
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
 import org.bson.internal.Base64
 import org.bson.types.Binary
+import org.springframework.data.domain.Page
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -49,7 +50,8 @@ class AuctionsController(
             createNewAuctionRequest.category,
             mutableListOf(),
             Binary(createNewAuctionRequest.file?.bytes),
-            createNewAuctionRequest.description
+            createNewAuctionRequest.description,
+            0
         )
 
         auctionService.createAuction(auction)
@@ -58,19 +60,28 @@ class AuctionsController(
     @GetMapping("/find")
     fun findAuctionsByName(
         @RequestParam query: String,
-        @RequestParam(required = false) category: String?
-    ): ResponseEntity<List<GetAuctionResponse>> {
-        val auctions: List<AuctionEntity> = if (category == null || category == "Wszystkie") {
-            auctionService.findAllContainingQuery(query)
+        @RequestParam(required = false) category: String?,
+        @RequestParam(defaultValue = "0") page: Int
+    ): ResponseEntity<GetAuctionResponse> {
+//        val auctions: List<AuctionEntity> = if (category == null || category == "Wszystkie") {
+//            auctionService.findAllContainingQuery(query)
+//        } else {
+//            auctionService.findAllContainingQueryAndCategory(query, category)
+//        }
+        val auctions: Page<AuctionEntity> = if (category == null || category == "Wszystkie") {
+            auctionService.findAllContainingQuery(query, page)
         } else {
-            auctionService.findAllContainingQueryAndCategory(query, category)
+            auctionService.findAllContainingQueryAndCategory(query, category, page)
         }
 
+//        return ResponseEntity.ok(
+//            auctions.stream()
+//                .map {
+//                    AuctionsMapper.toGetAuctionResponse(it)
+//                }.collect(Collectors.toList())
+//        )
         return ResponseEntity.ok(
-            auctions.stream()
-                .map {
-                    AuctionsMapper.toGetAuctionResponse(it)
-                }.collect(Collectors.toList())
+            AuctionsMapper.toGetAuctionResponse(auctions)
         )
     }
 

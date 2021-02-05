@@ -3,6 +3,7 @@ package com.orgella.auctionsmanagement.domain.service
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.AuctionReviewsEntity
 import com.orgella.auctionsmanagement.domain.repository.AuctionsRepository
+import org.springframework.data.domain.Page
 import java.math.BigDecimal
 import java.util.*
 
@@ -52,8 +53,20 @@ class DomainAuctionService(
         return auctionsRepository.findAllContainingQuery(query)
     }
 
+    override fun findAllContainingQuery(query: String, page: Int): Page<AuctionEntity> {
+        return auctionsRepository.findAllContainingQuery(query, page)
+    }
+
     override fun findAllContainingQueryAndCategory(query: String, category: String): List<AuctionEntity> {
         return auctionsRepository.findAllContainingQueryAndCategory(query, category)
+    }
+
+    override fun findAllContainingQueryAndCategory(
+        query: String,
+        category: String,
+        page: Int
+    ): Page<AuctionEntity> {
+        return auctionsRepository.findAllContainingQueryAndCategory(query, category, page)
     }
 
     override fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity> {

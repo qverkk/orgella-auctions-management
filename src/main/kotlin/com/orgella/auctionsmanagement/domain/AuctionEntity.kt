@@ -1,10 +1,13 @@
 package com.orgella.auctionsmanagement.domain
 
 import org.bson.types.Binary
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Version
 import java.math.BigDecimal
 import java.util.*
 
 data class AuctionEntity(
+    @field:Id
     var id: UUID,
     val title: String,
     var auctionPath: String,
@@ -15,5 +18,7 @@ data class AuctionEntity(
     var category: String,
     var reviews: MutableList<AuctionReviewsEntity>,
     var thumbnail: Binary,
-    var description: String
+    var description: String,
+    @field:Version
+    val version: Int
 )

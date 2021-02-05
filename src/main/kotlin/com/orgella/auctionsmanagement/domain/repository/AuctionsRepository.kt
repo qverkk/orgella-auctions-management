@@ -1,6 +1,7 @@
 package com.orgella.auctionsmanagement.domain.repository
 
 import com.orgella.auctionsmanagement.domain.AuctionEntity
+import org.springframework.data.domain.Page
 import java.util.*
 
 interface AuctionsRepository {
@@ -20,4 +21,8 @@ interface AuctionsRepository {
     fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity>
 
     fun findAllWithAuctionPaths(auctionPaths: List<String>): List<AuctionEntity>
+
+    fun findAllContainingQuery(query: String, page: Int): Page<AuctionEntity>
+
+    fun findAllContainingQueryAndCategory(query: String, category: String, page: Int): Page<AuctionEntity>
 }
