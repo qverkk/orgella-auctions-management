@@ -26,10 +26,11 @@ class DomainAuctionService(
     }
 
     override fun updateDescriptionForAuction(id: UUID, description: String) {
-        auctionsRepository.findById(id).ifPresent {
+        val function: (AuctionEntity) -> Unit = {
             it.description = description
             auctionsRepository.save(it)
         }
+        auctionsRepository.findById(id).ifPresent(function)
     }
 
     override fun updatePriceForAuction(id: UUID, price: BigDecimal) {
@@ -75,6 +76,10 @@ class DomainAuctionService(
 
     override fun findByAuctionPaths(auctionPaths: List<String>): List<AuctionEntity> {
         return auctionsRepository.findAllWithAuctionPaths(auctionPaths)
+    }
+
+    override fun update(auction: AuctionEntity) {
+        auctionsRepository.save(auction)
     }
 
     override fun findById(id: UUID): Optional<AuctionEntity> {

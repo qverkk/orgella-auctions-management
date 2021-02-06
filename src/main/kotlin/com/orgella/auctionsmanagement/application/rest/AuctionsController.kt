@@ -2,13 +2,12 @@ package com.orgella.auctionsmanagement.application.rest
 
 import com.orgella.auctionsmanagement.application.mapper.AuctionsMapper
 import com.orgella.auctionsmanagement.application.request.CreateNewAuctionRequest
-import com.orgella.auctionsmanagement.application.response.BasketItemInfo
-import com.orgella.auctionsmanagement.application.response.GetAuctionDetailsResponse
-import com.orgella.auctionsmanagement.application.response.GetAuctionResponse
-import com.orgella.auctionsmanagement.application.response.GetAuctionsForBasketResponse
+import com.orgella.auctionsmanagement.application.request.SellItemRequest
+import com.orgella.auctionsmanagement.application.response.*
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
 import com.orgella.auctionsmanagement.exceptions.NoAuctionPath
+import com.orgella.auctionsmanagement.exceptions.NotEnoughItemsException
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
 import org.bson.internal.Base64
 import org.bson.types.Binary
@@ -57,6 +56,27 @@ class AuctionsController(
         auctionService.createAuction(auction)
     }
 
+    @PostMapping("/sell")
+    fun increaseSoldAuctionQuantity(@RequestBody sellItem: SellItemRequest): ResponseEntity<SellItemResponse> {
+        val auction = auctionService.findByAuctionPath(sellItem.auctionPath).orElseThrow {
+            throw NoAuctionPath("${sellItem.auctionPath} could not be found")
+        }
+
+        if (auction.boughtQuantity + sellItem.quantity > auction.quantity) {
+            throw NotEnoughItemsException("${sellItem.auctionPath} doesn't have enough items to be sold")
+        }
+
+        auction.boughtQuantity += sellItem.quantity
+
+        auctionService.update(auction)
+
+        return ResponseEntity.ok(
+            SellItemResponse(
+                "Congratulations, you have bought ${sellItem.quantity} of ${auction.title}"
+            )
+        )
+    }
+
     @GetMapping("/find")
     fun findAuctionsByName(
         @RequestParam query: String,
@@ -93,6 +113,26 @@ class AuctionsController(
 
         return ResponseEntity.ok(
             AuctionsMapper.toGetAuctionDetailsResponse(auction)
+        )
+    }
+
+
+    @GetMapping("/details/orders")
+    fun getAutctionsForOrders(@RequestParam auctionPaths: List<String>): ResponseEntity<GetAuctionsForOrdersResponse> {
+        val auctions = auctionService.findByAuctionPaths(auctionPaths)
+
+        return ResponseEntity.ok(
+            GetAuctionsForOrdersResponse(
+                auctions.stream().map {
+                    OrderItemInfo(
+                        it.auctionPath,
+                        it.quantity,
+                        it.boughtQuantity,
+                        it.price,
+                        it.sellerUsername
+                    )
+                }.collect(Collectors.toList())
+            )
         )
     }
 

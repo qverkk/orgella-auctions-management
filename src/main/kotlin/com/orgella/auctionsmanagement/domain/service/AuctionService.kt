@@ -35,4 +35,6 @@ interface AuctionService {
     fun findByAuctionPath(auctionPath: String): Optional<AuctionEntity>
 
     fun findByAuctionPaths(auctionPaths: List<String>): List<AuctionEntity>
+
+    fun update(auction: AuctionEntity)
 }
