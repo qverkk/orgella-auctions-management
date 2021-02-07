@@ -6,7 +6,7 @@ import com.orgella.auctionsmanagement.application.request.SellItemRequest
 import com.orgella.auctionsmanagement.application.response.*
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
-import com.orgella.auctionsmanagement.exceptions.NoAuctionPath
+import com.orgella.auctionsmanagement.exceptions.NoAuctionPathException
 import com.orgella.auctionsmanagement.exceptions.NotEnoughItemsException
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
 import org.bson.internal.Base64
@@ -59,11 +59,11 @@ class AuctionsController(
     @PostMapping("/sell")
     fun increaseSoldAuctionQuantity(@RequestBody sellItem: SellItemRequest): ResponseEntity<SellItemResponse> {
         val auction = auctionService.findByAuctionPath(sellItem.auctionPath).orElseThrow {
-            throw NoAuctionPath("${sellItem.auctionPath} could not be found")
+            throw NoAuctionPathException("${sellItem.auctionPath} could not be found")
         }
 
         if (auction.boughtQuantity + sellItem.quantity > auction.quantity) {
-            throw NotEnoughItemsException("${sellItem.auctionPath} doesn't have enough items to be sold")
+            throw NotEnoughItemsException("${sellItem.auctionPath} nie ma wystarczająco sztuk na sprzedaż. Dostępne sztuki: ${auction.quantity - auction.boughtQuantity}")
         }
 
         auction.boughtQuantity += sellItem.quantity
@@ -72,7 +72,7 @@ class AuctionsController(
 
         return ResponseEntity.ok(
             SellItemResponse(
-                "Congratulations, you have bought ${sellItem.quantity} of ${auction.title}"
+                "Gratulacje! Udało Ci się kupić ${sellItem.quantity} sztok ${auction.title}"
             )
         )
     }
@@ -108,7 +108,7 @@ class AuctionsController(
     @GetMapping("/details/{auctionPath}")
     fun getAuctionDetails(@PathVariable auctionPath: String): ResponseEntity<GetAuctionDetailsResponse> {
         val auction = auctionService.findByAuctionPath(auctionPath).orElseThrow {
-            throw NoAuctionPath("$auctionPath doesn't exist")
+            throw NoAuctionPathException("$auctionPath doesn't exist")
         }
 
         return ResponseEntity.ok(
