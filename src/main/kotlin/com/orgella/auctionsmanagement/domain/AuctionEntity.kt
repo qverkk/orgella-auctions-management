@@ -16,7 +16,6 @@ data class AuctionEntity(
     var boughtQuantity: Int,
     var price: BigDecimal,
     var category: String,
-    var reviews: MutableList<AuctionReviewsEntity>,
     var thumbnail: Binary,
     var description: String,
     @field:Version

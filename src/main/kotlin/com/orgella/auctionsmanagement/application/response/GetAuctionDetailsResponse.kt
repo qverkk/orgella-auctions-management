@@ -9,7 +9,6 @@ data class GetAuctionDetailsResponse(
     val quantity: Int,
     val boughtQuantity: Int,
     val price: BigDecimal,
-    val reviews: List<GetReviewResponse>,
     val thumbnail: String,
     val description: String
 )

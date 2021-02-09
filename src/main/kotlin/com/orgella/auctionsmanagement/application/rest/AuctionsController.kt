@@ -8,6 +8,7 @@ import com.orgella.auctionsmanagement.application.response.*
 import com.orgella.auctionsmanagement.domain.AuctionEntity
 import com.orgella.auctionsmanagement.domain.AuctionReviewsEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
+import com.orgella.auctionsmanagement.domain.service.ReviewService
 import com.orgella.auctionsmanagement.exceptions.NoAuctionPathException
 import com.orgella.auctionsmanagement.exceptions.NotEnoughItemsException
 import com.orgella.auctionsmanagement.infrastructure.configuration.security.UserInfo
@@ -28,8 +29,32 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("auctions")
 class AuctionsController(
-    private val auctionService: AuctionService
+    private val auctionService: AuctionService,
+    private val reviewService: ReviewService
 ) {
+
+    @GetMapping("/reviews/{auctionPath}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getReviewsForAuctionPath(
+        @PathVariable auctionPath: String,
+        @RequestParam(defaultValue = "0") page: Int
+    ): ResponseEntity<GetReviewsForAuctionResponse> {
+        val reviews = reviewService.findAllReviewsForAuctionPath(auctionPath, page)
+
+        return ResponseEntity.ok(
+            GetReviewsForAuctionResponse(
+                reviews.number,
+                reviews.totalPages,
+                reviews.content.map {
+                    ReviewForAuction(
+                        it.date,
+                        it.reviewerUsername,
+                        it.rating,
+                        it.description
+                    )
+                }
+            )
+        )
+    }
 
     @PostMapping(
         "/create/review",
@@ -48,8 +73,11 @@ class AuctionsController(
             0
         )
 
-        auctionService.addReviewForAuctionPath(
-            createReviewRequest.auctionPath,
+        val auction = auctionService.findByAuctionPath(createReviewRequest.auctionPath).orElseThrow {
+            throw NoAuctionPathException("Auction path ${createReviewRequest.auctionPath} couldn't be found")
+        }
+
+        reviewService.save(
             reviewsEntity
         )
 
@@ -78,7 +106,6 @@ class AuctionsController(
             0,
             BigDecimal(createNewAuctionRequest.price),
             createNewAuctionRequest.category,
-            mutableListOf(),
             Binary(createNewAuctionRequest.file?.bytes),
             createNewAuctionRequest.description,
             0

@@ -18,13 +18,6 @@ class DomainAuctionService(
         auctionsRepository.deleteAuctionById(id)
     }
 
-    override fun addReviewForAuctionPath(auctionPath: String, review: AuctionReviewsEntity) {
-        auctionsRepository.findByAuctionPath(auctionPath).ifPresent {
-            it.reviews.add(review)
-            auctionsRepository.save(it)
-        }
-    }
-
     override fun updateDescriptionForAuction(id: UUID, description: String) {
         val function: (AuctionEntity) -> Unit = {
             it.description = description
@@ -42,12 +35,6 @@ class DomainAuctionService(
 
     override fun findAllAuctions(): List<AuctionEntity> {
         return auctionsRepository.findAll()
-    }
-
-    override fun findReviewsForAuctionById(id: UUID): List<AuctionReviewsEntity> {
-        val auction = auctionsRepository.findById(id).orElseGet { null } ?: return emptyList()
-
-        return auction.reviews
     }
 
     override fun findAllContainingQuery(query: String): List<AuctionEntity> {

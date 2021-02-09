@@ -43,9 +43,6 @@ object AuctionsMapper {
             auction.quantity,
             auction.boughtQuantity,
             auction.price,
-            auction.reviews.stream().map { review ->
-                ReviewsMapper.toResponse(review)
-            }.collect(Collectors.toList()),
             Base64.encode(auction.thumbnail.data),
             auction.description
         )

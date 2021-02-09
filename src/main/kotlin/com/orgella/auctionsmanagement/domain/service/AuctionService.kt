@@ -12,8 +12,6 @@ interface AuctionService {
 
     fun deleteAuctionById(id: UUID)
 
-    fun addReviewForAuctionPath(auctionPath: String, review: AuctionReviewsEntity)
-
     fun findById(id: UUID): Optional<AuctionEntity>
 
     fun updateDescriptionForAuction(id: UUID, description: String)
@@ -21,8 +19,6 @@ interface AuctionService {
     fun updatePriceForAuction(id: UUID, price: BigDecimal)
 
     fun findAllAuctions(): List<AuctionEntity>
-
-    fun findReviewsForAuctionById(id: UUID): List<AuctionReviewsEntity>
 
     fun findAllContainingQuery(query: String): List<AuctionEntity>
 
