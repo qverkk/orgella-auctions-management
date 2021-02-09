@@ -2,9 +2,11 @@ package com.orgella.auctionsmanagement.application.rest
 
 import com.orgella.auctionsmanagement.application.mapper.AuctionsMapper
 import com.orgella.auctionsmanagement.application.request.CreateNewAuctionRequest
+import com.orgella.auctionsmanagement.application.request.CreateReviewRequest
 import com.orgella.auctionsmanagement.application.request.SellItemRequest
 import com.orgella.auctionsmanagement.application.response.*
 import com.orgella.auctionsmanagement.domain.AuctionEntity
+import com.orgella.auctionsmanagement.domain.AuctionReviewsEntity
 import com.orgella.auctionsmanagement.domain.service.AuctionService
 import com.orgella.auctionsmanagement.exceptions.NoAuctionPathException
 import com.orgella.auctionsmanagement.exceptions.NotEnoughItemsException
@@ -29,10 +31,39 @@ class AuctionsController(
     private val auctionService: AuctionService
 ) {
 
-    //    @PreAuthorize("hasRole('ROLE_SELLER')")
-    @PostMapping
+    @PostMapping(
+        "/create/review",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun createReviewForAuction(@Valid @RequestBody createReviewRequest: CreateReviewRequest): ResponseEntity<CreateReviewResponse> {
+        val reviewsEntity = AuctionReviewsEntity(
+            UUID.randomUUID(),
+            Date(),
+            createReviewRequest.auctionPath,
+            createReviewRequest.orderId,
+            createReviewRequest.username,
+            createReviewRequest.rating,
+            createReviewRequest.description,
+            0
+        )
+
+        auctionService.addReviewForAuctionPath(
+            createReviewRequest.auctionPath,
+            reviewsEntity
+        )
+
+        return ResponseEntity.ok(
+            CreateReviewResponse(
+                reviewsEntity.id.toString()
+            )
+        )
+    }
+
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createAuction(
-        @ModelAttribute @Valid createNewAuctionRequest: CreateNewAuctionRequest,
+        @Valid @ModelAttribute createNewAuctionRequest: CreateNewAuctionRequest,
         auth: Authentication
     ) {
         val auctionPath = createNewAuctionRequest.title.replace(" ", "-").plus("-").plus(Instant.now().epochSecond)
@@ -56,7 +87,7 @@ class AuctionsController(
         auctionService.createAuction(auction)
     }
 
-    @PostMapping("/sell")
+    @PostMapping("/sell", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun increaseSoldAuctionQuantity(@RequestBody sellItem: SellItemRequest): ResponseEntity<SellItemResponse> {
         val auction = auctionService.findByAuctionPath(sellItem.auctionPath).orElseThrow {
             throw NoAuctionPathException("${sellItem.auctionPath} could not be found")
@@ -77,7 +108,7 @@ class AuctionsController(
         )
     }
 
-    @GetMapping("/find")
+    @GetMapping("/find", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findAuctionsByName(
         @RequestParam query: String,
         @RequestParam(required = false) category: String?,
@@ -105,7 +136,7 @@ class AuctionsController(
         )
     }
 
-    @GetMapping("/details/{auctionPath}")
+    @GetMapping("/details/{auctionPath}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAuctionDetails(@PathVariable auctionPath: String): ResponseEntity<GetAuctionDetailsResponse> {
         val auction = auctionService.findByAuctionPath(auctionPath).orElseThrow {
             throw NoAuctionPathException("$auctionPath doesn't exist")
@@ -117,7 +148,7 @@ class AuctionsController(
     }
 
 
-    @GetMapping("/details/orders")
+    @GetMapping("/details/orders", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAutctionsForOrders(@RequestParam auctionPaths: List<String>): ResponseEntity<GetAuctionsForOrdersResponse> {
         val auctions = auctionService.findByAuctionPaths(auctionPaths)
 
@@ -136,7 +167,7 @@ class AuctionsController(
         )
     }
 
-    @GetMapping("/details/basket")
+    @GetMapping("/details/basket", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAutctionsForBasket(@RequestParam auctionPaths: List<String>): ResponseEntity<GetAuctionsForBasketResponse> {
         val auctions = auctionService.findByAuctionPaths(auctionPaths)
 

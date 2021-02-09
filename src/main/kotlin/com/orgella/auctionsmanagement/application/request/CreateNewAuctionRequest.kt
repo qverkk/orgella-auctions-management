@@ -8,7 +8,7 @@ import javax.validation.constraints.Size
 
 data class CreateNewAuctionRequest(
     @field:NotNull(message = "Title cannot be null")
-    @field:Size(min = 1, message = "Minimum title length is 3")
+    @field:Size(min = 3, message = "Minimum title length is 3")
     var title: String,
     @field:NotNull(message = "Quantity cannot be null")
     @field:Min(1, message = "Minimum quantity is 1")

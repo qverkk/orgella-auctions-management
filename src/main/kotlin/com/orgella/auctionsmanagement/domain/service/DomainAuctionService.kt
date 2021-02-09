@@ -18,8 +18,8 @@ class DomainAuctionService(
         auctionsRepository.deleteAuctionById(id)
     }
 
-    override fun addReviewForAuction(id: UUID, review: AuctionReviewsEntity) {
-        auctionsRepository.findById(id).ifPresent {
+    override fun addReviewForAuctionPath(auctionPath: String, review: AuctionReviewsEntity) {
+        auctionsRepository.findByAuctionPath(auctionPath).ifPresent {
             it.reviews.add(review)
             auctionsRepository.save(it)
         }

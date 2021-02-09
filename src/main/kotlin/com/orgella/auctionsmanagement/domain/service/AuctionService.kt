@@ -12,7 +12,7 @@ interface AuctionService {
 
     fun deleteAuctionById(id: UUID)
 
-    fun addReviewForAuction(id: UUID, review: AuctionReviewsEntity)
+    fun addReviewForAuctionPath(auctionPath: String, review: AuctionReviewsEntity)
 
     fun findById(id: UUID): Optional<AuctionEntity>
 
