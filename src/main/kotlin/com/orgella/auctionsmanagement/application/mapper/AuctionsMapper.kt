@@ -40,7 +40,7 @@ object AuctionsMapper {
             auction.title,
             auction.auctionPath,
             auction.sellerUsername,
-            auction.quantity,
+            auction.quantity - auction.boughtQuantity,
             auction.boughtQuantity,
             auction.price,
             Base64.encode(auction.thumbnail.data),
