@@ -33,6 +33,21 @@ class AuctionsController(
     private val reviewService: ReviewService
 ) {
 
+    @GetMapping("/reviews/sum/{auctionPath}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getReviewsCountAndOverallRating(@PathVariable auctionPath: String): ResponseEntity<GetReviewsCountAndOverallRatingResponse> {
+        val ratings = reviewService.sumReviewsCountAndRating(auctionPath).orElseThrow {
+            throw NoAuctionPathException("$auctionPath couldn't be found")
+        }
+
+        val overallRating = (ratings.totalRatings / (ratings.count)).toDouble()
+        return ResponseEntity.ok(
+            GetReviewsCountAndOverallRatingResponse(
+                ratings.count,
+                BigDecimal.valueOf(overallRating)
+            )
+        )
+    }
+
     @GetMapping("/reviews/{auctionPath}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getReviewsForAuctionPath(
         @PathVariable auctionPath: String,

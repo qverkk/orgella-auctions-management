@@ -1,11 +1,14 @@
 package com.orgella.auctionsmanagement.infrastructure.repository.mongo
 
 import com.orgella.auctionsmanagement.domain.AuctionReviewsEntity
+import com.orgella.auctionsmanagement.domain.RatingsAndCount
 import com.orgella.auctionsmanagement.domain.repository.ReviewRepository
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.mongodb.core.aggregation.AggregationResults
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 @Primary
@@ -21,4 +24,7 @@ class MongoReviewRepository(
         return repository.findAllByAuctionPath(auctionPath, pageable)
     }
 
+    override fun sumReviewsCountAndRating(auctionPath: String): AggregationResults<RatingsAndCount> {
+        return repository.sumRatingsAndCountReviews(auctionPath)
+    }
 }
